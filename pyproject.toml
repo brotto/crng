@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crng"
+version = "0.1.0"
+description = "Contingency Random Number Generator — numbers with controllable fat tails, volatility clustering, and scale convergence"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Ale Brotto", email = "ale@brotto.io"},
+]
+keywords = [
+    "random", "rng", "prng", "fat-tails", "kurtosis",
+    "volatility-clustering", "financial-simulation",
+    "monte-carlo", "contingency", "econophysics",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Office/Business :: Financial",
+]
+dependencies = [
+    "numpy>=1.20",
+]
+
+[project.urls]
+Homepage = "https://github.com/alebrotto/crng"
+Documentation = "https://github.com/alebrotto/crng#usage"
+Repository = "https://github.com/alebrotto/crng"
+Issues = "https://github.com/alebrotto/crng/issues"
+
+[tool.setuptools.packages.find]
+include = ["crng*"]
