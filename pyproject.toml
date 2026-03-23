@@ -32,10 +32,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/alebrotto/crng"
-Documentation = "https://github.com/alebrotto/crng#usage"
-Repository = "https://github.com/alebrotto/crng"
-Issues = "https://github.com/alebrotto/crng/issues"
+Homepage = "https://github.com/brotto/crng"
+Documentation = "https://github.com/brotto/crng#usage"
+Repository = "https://github.com/brotto/crng"
+Issues = "https://github.com/brotto/crng/issues"
 
 [tool.setuptools.packages.find]
 include = ["crng*"]
