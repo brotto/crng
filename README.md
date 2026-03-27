@@ -4,13 +4,23 @@
 
 CRNG generates random numbers with controllable fat tails, volatility clustering, and scale convergence — statistical properties present in real financial markets but absent from conventional PRNGs.
 
-| Property | Conventional PRNG | CRNG | Real Market (Gold) |
-|:--|:--:|:--:|:--:|
-| Kurtosis (K) | 3.0 | **9.8** | 9.26 |
-| Vol clustering | 0.00 | **0.35** | 0.27 |
-| >3-sigma events | 0.3% | **1.2%** | 1.9% |
-| Scale convergence | Flat | **Natural** | Natural |
-| Permutation entropy | 0.989 | **0.999** | 0.998 |
+## Real-World Validation
+
+Tested against **7 real assets, 5 years of daily data, 7 metrics, 10 seeds**:
+
+| Asset | Real K | CRNG K | NumPy K | CRNG Score |
+|:------|-------:|-------:|--------:|:----------:|
+| Gold | 15.6 | 11.2 | 3.0 | 6/7 |
+| S&P 500 | 9.6 | 8.4 | 3.0 | 6/7 |
+| ETH | 8.2 | 8.5 | 3.0 | **7/7** |
+| BTC | 6.9 | 7.3 | 3.0 | **7/7** |
+| Oil | 6.4 | 8.5 | 3.0 | 6/7 |
+| USDJPY | 6.0 | 5.1 | 3.0 | 5/7 |
+| EURUSD | 4.9 | 3.1 | 3.0 | 5/7 |
+
+**CRNG wins 42/49 metrics (86%).** NumPy PRNG produces K=3.0 for everything.
+
+Full comparison: [`examples/real_world_comparison.py`](examples/real_world_comparison.py)
 
 ## Installation
 
@@ -21,7 +31,7 @@ pip install crng
 ## Quick Start
 
 ```python
-from crng import gold, eth, gaussian, ContingencyRNG
+from crng import gold, eth, gaussian, ContingencyRNG, from_data
 
 # Gold-market-like numbers (K ~ 9)
 rng = gold(seed=42)
@@ -38,6 +48,10 @@ xs = rng.generate(1000)
 
 # Custom kurtosis target
 rng = ContingencyRNG(seed=42, target_kurtosis=15.0, vol_clustering=0.3)
+xs = rng.generate(1000)
+
+# Auto-calibrate from real data (prices or returns)
+rng = from_data(my_price_series, seed=42)
 xs = rng.generate(1000)
 
 # Binary (coin flip with contingency)
@@ -62,15 +76,51 @@ Each oscillator pair is coupled with strength proportional to their frequency pr
 ### Layer 3: Cascade Amplifier
 A feedback loop where extreme values amplify subsequent values. When recent outputs exceed a threshold, the next output is scaled up — creating cascading extremes (fat tails). The system exhibits a **phase transition**: below a critical amplification, cascades dissipate (K ~ 3); above, they self-amplify (K >> 3).
 
-## Presets
+## API
 
-| Preset | Target K | Actual K | Modeled After |
-|:--|:--:|:--:|:--|
-| `gaussian()` | 3.0 | 2.8 | Pure PRNG |
-| `gold()` | 9.3 | 9.8 | Gold (XAU/USD) |
-| `eurusd()` | 10.5 | 9.6 | EUR/USD forex |
-| `eth()` | 22.9 | 25.4 | Ethereum |
-| `btc()` | 219 | 91 | Bitcoin (extreme) |
+### `ContingencyRNG(seed, target_kurtosis, vol_clustering, ...)`
+
+| Parameter | Default | Description |
+|:--|:--:|:--|
+| `seed` | 42 | Reproducibility seed |
+| `target_kurtosis` | 9.26 | Target kurtosis (3=Gaussian, 9=Gold, 23=ETH) |
+| `vol_clustering` | 0.3 | Volatility clustering strength (0-1) |
+| `n_oscillators` | 4 | Number of oscillator pairs |
+| `cascade_threshold` | 1.2 | Cascade trigger threshold |
+| `cascade_memory` | 20 | Cascade memory window |
+
+### Methods
+
+| Method | Returns | Description |
+|:--|:--|:--|
+| `next()` | `float` | Single random number |
+| `flip()` | `int` | 0 or 1 |
+| `generate(n)` | `ndarray` | Array of n numbers |
+| `generate_flips(n)` | `ndarray` | Array of n flips |
+| `uniform(low, high)` | `float` | Mapped to [low, high] |
+| `reset(seed)` | `None` | Reset to initial state |
+| `stats(n)` | `dict` | Statistical summary |
+
+### Presets
+
+| Preset | Target K | Modeled After |
+|:--|:--:|:--|
+| `gaussian()` | 3.0 | Pure PRNG |
+| `gold()` | 9.3 | Gold (XAU/USD) |
+| `eurusd()` | 10.5 | EUR/USD forex |
+| `eth()` | 22.9 | Ethereum |
+| `btc()` | 219 | Bitcoin (extreme) |
+
+### `from_data(data, seed=42)`
+
+Auto-calibrate from real data. Pass prices (will compute log returns) or returns directly. Uses iterative calibration to match the data's kurtosis and vol clustering.
+
+```python
+import yfinance as yf
+prices = yf.Ticker("AAPL").history(period="2y")["Close"].values
+rng = from_data(prices, seed=42)
+synthetic = rng.generate(len(prices))
+```
 
 ## Use Cases
 
@@ -100,9 +150,11 @@ K
 
 Below the threshold: cascades dissipate. Above: they self-amplify exponentially. Real markets appear to operate just above this critical point.
 
-## Paper
+## Performance
 
-The research behind CRNG is documented in:
+~5M numbers/second on a single core. Pure NumPy, no external dependencies.
+
+## Paper
 
 > Brotto, A. (2026). "Contingency as Mechanism: How Resonance Cascades Bridge the Gap Between Pseudo-Random and Market-Like Time Series." [arXiv preprint]
 

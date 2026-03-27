@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crng"
-version = "0.1.0"
+version = "0.2.0"
 description = "Contingency Random Number Generator — numbers with controllable fat tails, volatility clustering, and scale convergence"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 requires-python = ">=3.8"
 authors = [
     {name = "Ale Brotto", email = "ale@brotto.io"},
@@ -21,7 +21,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Financial and Insurance Industry",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Physics",

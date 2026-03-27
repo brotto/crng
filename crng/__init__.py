@@ -424,3 +424,75 @@ def btc(seed=42):
 def eurusd(seed=42):
     """EURUSD-like: K≈10.5, moderate everything."""
     return ContingencyRNG(seed=seed, target_kurtosis=10.5, vol_clustering=0.25)
+
+
+def from_data(data, seed=42, calibration_rounds=5):
+    """Auto-calibrate CRNG from real data (prices or returns).
+
+    Measures kurtosis and vol clustering from the data and iteratively
+    tunes the CRNG to match the data's statistical signature.
+
+    Args:
+        data: array-like of prices (will compute log returns)
+              or returns (if mean ≈ 0 and std << 1)
+        seed: random seed for reproducibility
+        calibration_rounds: number of iterative tuning rounds (default 5)
+
+    Returns:
+        ContingencyRNG calibrated to the data's statistical signature
+    """
+    data = np.array(data, dtype=float)
+    data = data[np.isfinite(data) & (data != 0)]
+
+    # Detect if data is prices or returns
+    if np.mean(np.abs(data)) > 1 and np.std(data) > 0.1:
+        # Likely prices — compute log returns
+        returns = np.diff(np.log(data))
+    else:
+        returns = data
+
+    returns = returns[np.isfinite(returns)]
+    n = len(returns)
+    if n < 30:
+        raise ValueError(f"Need at least 30 data points, got {n}")
+
+    # Measure target kurtosis (excess + 3)
+    m = np.mean(returns)
+    s = np.std(returns, ddof=1)
+    if s == 0:
+        raise ValueError("Data has zero variance")
+    K_target = float(np.mean(((returns - m) / s) ** 4))
+    K_target = max(3.0, K_target)
+
+    # Measure vol clustering via ACF of |returns|
+    abs_r = np.abs(returns)
+    am = np.mean(abs_r)
+    av = np.var(abs_r)
+    if av > 0 and n > 10:
+        acf1 = float(np.sum((abs_r[:-1] - am) * (abs_r[1:] - am)) / (n * av))
+        vol_cl = max(0.0, min(1.0, acf1 * 3))  # Scale ACF to [0, 1]
+    else:
+        vol_cl = 0.0
+
+    # Iterative calibration: adjust target_kurtosis to match actual output
+    K_input = K_target
+    test_n = max(n, 5000)  # Use more samples for stable measurement
+
+    for _ in range(calibration_rounds):
+        rng = ContingencyRNG(seed=seed, target_kurtosis=K_input, vol_clustering=vol_cl)
+        test_values = rng.generate(test_n)
+        ts = np.std(test_values)
+        if ts > 0:
+            K_actual = float(np.mean(((test_values - np.mean(test_values)) / ts) ** 4))
+        else:
+            K_actual = 3.0
+
+        # Adjust: if actual K is too high, reduce input; if too low, increase
+        if K_actual > 3.0:
+            ratio = K_target / K_actual
+            K_input = K_input * ratio
+            K_input = max(3.0, K_input)
+        else:
+            break
+
+    return ContingencyRNG(seed=seed, target_kurtosis=K_input, vol_clustering=vol_cl)
