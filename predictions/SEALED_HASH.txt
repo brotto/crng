@@ -1,0 +1,16 @@
+CRNG PREDICTION SEAL
+====================
+
+Date: 2026-03-31
+File: predictions/2026-03-31_next_catastrophe.md
+
+SHA-256: 33356f25c094746cc861ca7f77736ba6c8614ed83dfc2937389e7b068ffbfbbf
+
+To verify integrity:
+  shasum -a 256 predictions/2026-03-31_next_catastrophe.md
+
+If the hash matches, the document has not been modified since this seal was created.
+
+This hash was committed to GitHub (github.com/brotto/crng) and published on X
+on 2026-03-31, establishing proof of anteriority for the predictions contained
+in the document.
