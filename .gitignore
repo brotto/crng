@@ -9,3 +9,8 @@ build/
 *.egg
 .venv/
 env/
+
+# Data files (too large for git)
+fragility_monitor/data/
+weather_monitor/data/
+data/
