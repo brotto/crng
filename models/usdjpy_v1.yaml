@@ -1,0 +1,109 @@
+name: usdjpy
+asset: USDJPY
+version: 1
+created: 2026-04-10
+author: ale-brotto
+scope: "Descriptive-generative. This model does NOT forecast prices or returns. It reproduces (imperfectly) the statistical shape of the asset's log-returns on the frozen snapshot window."
+source:
+  snapshot_csv: benchmarks/snapshot_2026-04/prices.csv
+  snapshot_sha256: 82f8b5e5abe2f9d084769898b8d3b6ffefc5cfbd1c2757531df76d049ec9fff5
+  asset_column: USDJPY
+train_window:
+  start: 2021-04-11
+  end: 2024-04-04
+  n_prices: 780
+  n_returns: 779
+  fraction_of_series: 0.6
+validation_window:
+  start: 2024-04-07
+  end: 2026-04-09
+  n_prices: 520
+  n_returns: 519
+  disjoint_from_train: true
+target_fingerprint:
+  n: 779
+  mean: 0.0004127305778
+  std: 0.005948332791
+  kurtosis: 7.116180941
+  skewness: -0.5062729632
+  vol_acf_lag1: 0.1207130432
+  vol_acf_lag5: 0.08649663501
+  tail_3sigma_pct: 1.283697047
+  tail_4sigma_pct: 0.3851091142
+achieved_fingerprint:
+  n: 779
+  mean: 0.03472276849
+  std: 0.5515911866
+  kurtosis: 3.506992199
+  skewness: 0.3013899114
+  vol_acf_lag1: 0.04123618587
+  vol_acf_lag5: 0.00627039706
+  tail_3sigma_pct: 0.7702182285
+  tail_4sigma_pct: 0.1283697047
+  seed: 42
+  n_samples: 779
+  note: CRNG output at train n — in-sample fit check.
+validation_fingerprint:
+  real:
+    n: 519
+    mean: 9.365103165e-05
+    std: 0.006364699006
+    kurtosis: 4.542194958
+    skewness: -0.3793572967
+    vol_acf_lag1: 0.06590742213
+    vol_acf_lag5: 0.09178536482
+    tail_3sigma_pct: 1.348747592
+    tail_4sigma_pct: 0
+  crng:
+    n: 519
+    mean: 0.0327966576
+    std: 0.5723946422
+    kurtosis: 3.596999583
+    skewness: 0.3177945208
+    vol_acf_lag1: 0.07999162464
+    vol_acf_lag5: -0.03716597891
+    tail_3sigma_pct: 0.7707129094
+    tail_4sigma_pct: 0
+    seed: 42
+    n_samples: 519
+    note: CRNG hyperparameters FROZEN from train_window. Output has not been tuned against validation data; OOS.
+hyperparameters:
+  target_kurtosis: 4.468781033
+  vol_clustering: 0.3349651376
+  n_oscillators: 4
+  cascade_threshold: 1.2
+  cascade_memory: 20
+  amplification: 2.758536833
+calibration_algorithm: crng.from_data (iterative, 5 rounds, ACF*3 clamp)
+honest_misses:
+  kurtosis_train:
+    target: 7.116180941
+    achieved: 3.506992199
+    gap_pct: -50.71805752
+    verdict: CRNG undershoots the target kurtosis by ~50.7%.
+  kurtosis_val:
+    real: 4.542194958
+    crng: 3.596999583
+    gap_pct: -20.80922072
+    verdict: CRNG undershoots the target kurtosis by ~20.8%.
+  vol_acf_lag1_train:
+    target: 0.1207130432
+    achieved: 0.04123618587
+    verdict: "Vol-clustering partially reproduced: target 0.121, achieved 0.041."
+  vol_acf_lag1_val:
+    real: 0.06590742213
+    crng: 0.07999162464
+    verdict: Vol-clustering OK (target 0.066, achieved 0.080).
+  std_train:
+    target: 0.005948332791
+    achieved: 0.5515911866
+    verdict: CRNG output is on a different amplitude scale (ratio ≈ 92.73). CRNG is a SHAPE generator; downstream users must rescale before computing VaR or comparing levels.
+  std_val:
+    real: 0.006364699006
+    crng: 0.5723946422
+    verdict: CRNG output is on a different amplitude scale (ratio ≈ 89.93). CRNG is a SHAPE generator; downstream users must rescale before computing VaR or comparing levels.
+  tail_3sigma_val:
+    real_pct: 1.348747592
+    crng_pct: 0.7707129094
+    verdict: "Tail frequency MISSED: CRNG undershoots — real 1.35% vs CRNG 0.77% beyond 3σ (gap 0.58 pp, 43% relative)."
+  calibration_degeneracy: Calibration reached a non-degenerate state.

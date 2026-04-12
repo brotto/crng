@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crng"
-version = "0.2.0"
+version = "0.2.1"
 description = "Contingency Random Number Generator — numbers with controllable fat tails, volatility clustering, and scale convergence"
 readme = "README.md"
 license = "MIT"

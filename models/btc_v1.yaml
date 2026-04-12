@@ -1,0 +1,109 @@
+name: btc
+asset: BTC
+version: 1
+created: 2026-04-10
+author: ale-brotto
+scope: "Descriptive-generative. This model does NOT forecast prices or returns. It reproduces (imperfectly) the statistical shape of the asset's log-returns on the frozen snapshot window."
+source:
+  snapshot_csv: benchmarks/snapshot_2026-04/prices.csv
+  snapshot_sha256: 82f8b5e5abe2f9d084769898b8d3b6ffefc5cfbd1c2757531df76d049ec9fff5
+  asset_column: BTC
+train_window:
+  start: 2021-04-10
+  end: 2024-04-09
+  n_prices: 1096
+  n_returns: 1095
+  fraction_of_series: 0.6
+validation_window:
+  start: 2024-04-10
+  end: 2026-04-10
+  n_prices: 731
+  n_returns: 730
+  disjoint_from_train: true
+target_fingerprint:
+  n: 1095
+  mean: 0.000132627105
+  std: 0.03219805486
+  kurtosis: 6.514704869
+  skewness: -0.3587733426
+  vol_acf_lag1: 0.1373800711
+  vol_acf_lag5: 0.09157263047
+  tail_3sigma_pct: 2.00913242
+  tail_4sigma_pct: 0.4566210046
+achieved_fingerprint:
+  n: 1095
+  mean: 0.0004649936862
+  std: 0.6060702007
+  kurtosis: 7.044530411
+  skewness: -0.336107252
+  vol_acf_lag1: -0.02203309111
+  vol_acf_lag5: 0.02320738195
+  tail_3sigma_pct: 0.7305936073
+  tail_4sigma_pct: 0.3652968037
+  seed: 42
+  n_samples: 1095
+  note: CRNG output at train n — in-sample fit check.
+validation_fingerprint:
+  real:
+    n: 730
+    mean: 4.408775037e-05
+    std: 0.02482887148
+    kurtosis: 6.902389204
+    skewness: 0.1026868344
+    vol_acf_lag1: 0.1331376472
+    vol_acf_lag5: 0.1147033163
+    tail_3sigma_pct: 1.232876712
+    tail_4sigma_pct: 0.4109589041
+  crng:
+    n: 730
+    mean: 0.01131197546
+    std: 0.6195432648
+    kurtosis: 8.498707775
+    skewness: -0.4710916874
+    vol_acf_lag1: -0.004001799814
+    vol_acf_lag5: 0.01650380575
+    tail_3sigma_pct: 0.9589041096
+    tail_4sigma_pct: 0.5479452055
+    seed: 42
+    n_samples: 730
+    note: CRNG hyperparameters FROZEN from train_window. Output has not been tuned against validation data; OOS.
+hyperparameters:
+  target_kurtosis: 5.177140346
+  vol_clustering: 0.4124154909
+  n_oscillators: 4
+  cascade_threshold: 1.2
+  cascade_memory: 20
+  amplification: 3.059046782
+calibration_algorithm: crng.from_data (iterative, 5 rounds, ACF*3 clamp)
+honest_misses:
+  kurtosis_train:
+    target: 6.514704869
+    achieved: 7.044530411
+    gap_pct: 8.13276353
+    verdict: CRNG overshoots the target kurtosis by ~8.1%.
+  kurtosis_val:
+    real: 6.902389204
+    crng: 8.498707775
+    gap_pct: 23.12704374
+    verdict: CRNG overshoots the target kurtosis by ~23.1%.
+  vol_acf_lag1_train:
+    target: 0.1373800711
+    achieved: -0.02203309111
+    verdict: "Vol-clustering NOT reproduced: target ACF1=0.137, achieved=-0.022. This is the documented structural weakness of the current cascade model."
+  vol_acf_lag1_val:
+    real: 0.1331376472
+    crng: -0.004001799814
+    verdict: "Vol-clustering NOT reproduced: target ACF1=0.133, achieved=-0.004. This is the documented structural weakness of the current cascade model."
+  std_train:
+    target: 0.03219805486
+    achieved: 0.6060702007
+    verdict: CRNG output is on a different amplitude scale (ratio ≈ 18.82). CRNG is a SHAPE generator; downstream users must rescale before computing VaR or comparing levels.
+  std_val:
+    real: 0.02482887148
+    crng: 0.6195432648
+    verdict: CRNG output is on a different amplitude scale (ratio ≈ 24.95). CRNG is a SHAPE generator; downstream users must rescale before computing VaR or comparing levels.
+  tail_3sigma_val:
+    real_pct: 1.232876712
+    crng_pct: 0.9589041096
+    verdict: "Tail frequency approximately reproduced: real 1.23% vs CRNG 0.96% (gap 0.27 pp, 22% relative)."
+  calibration_degeneracy: Calibration reached a non-degenerate state.

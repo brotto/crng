@@ -1,0 +1,20 @@
+{
+  "n_samples_per_trial": 78,
+  "n_trials": 100000,
+  "seed": 1,
+  "distribution_family": "iid_standard_normal",
+  "statistic": "max(|FFT[1:]|) / mean(|FFT[1:]|)",
+  "mean_ratio": 2.3290693124663773,
+  "std_ratio": 0.32592414883089943,
+  "percentiles": {
+    "50": 2.285190210422463,
+    "75": 2.5113108524812926,
+    "90": 2.7570704199813294,
+    "95": 2.925384822991762,
+    "99": 3.2986940703108165,
+    "99.9": 3.795618179618543
+  },
+  "fraction_at_or_above_5_46": 0.0,
+  "fraction_at_or_above_3_0": 0.03709,
+  "interpretation": "The 5.46x peak-to-mean ratio reported in the original catastrophic_events.py experiment is located at approximately the 100.0-th percentile of the null distribution for iid standard normal samples of the same length. A threshold of 3.0x is routinely exceeded by pure noise."
+}

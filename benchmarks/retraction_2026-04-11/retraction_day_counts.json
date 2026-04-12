@@ -1,0 +1,8 @@
+{
+  "retraction_date": "2026-04-11",
+  "seal_date": "2026-03-31",
+  "falsification_window_close": "2028-06-30",
+  "days_seal_to_retraction": 11,
+  "days_retraction_to_window_close": 811,
+  "days_seal_to_window_close": 822
+}

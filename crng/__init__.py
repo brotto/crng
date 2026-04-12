@@ -346,28 +346,60 @@ class ContingencyRNG:
         )
 
     def stats(self, n: int = 10000) -> dict:
-        """Generate n numbers and compute statistics."""
+        """Generate n numbers and compute fingerprint statistics.
+
+        Per SPECS.md principle P5, ``generate(n)`` returns log-scale returns.
+        Statistics are therefore computed DIRECTLY on the generated values,
+        not on ``np.diff(values)``. Prior to 2026-04-10 this method applied a
+        spurious ``diff`` before measuring kurtosis and vol clustering, which
+        conflated "returns" with "price levels" and produced measurements
+        inconsistent with ``from_data()``. That inconsistency is documented as
+        Codex P2.4 in REVIEWS/codex_review_2026-04.md and was fixed here on
+        2026-04-10.
+
+        Consequence of the fix: empirical kurtosis values reported by this
+        method now differ significantly from pre-errata values. The target
+        kurtosis of existing presets (gold=9.26, eth=22.85, btc=219) was
+        implicitly calibrated against the OLD buggy measurement; with the
+        corrected measurement, the presets do NOT hit their documented targets.
+        The README preset table now reports target AND achieved columns
+        separately per SPECS.md principle P4.
+        """
         values = self.generate(n)
-        diffs = np.diff(values)
 
-        # Kurtosis of diffs
-        m = np.mean(diffs)
-        s = np.std(diffs)
-        K = np.mean(((diffs - m) / s) ** 4) if s > 0 else 3.0
+        # Kurtosis of the raw output (which IS the return series, per P5)
+        m = np.mean(values)
+        s = np.std(values, ddof=1)
+        if s == 0:
+            K = 3.0
+            skew = 0.0
+        else:
+            z = (values - m) / s
+            K = float(np.mean(z ** 4))
+            skew = float(np.mean(z ** 3))
 
-        # Vol clustering (ACF of |diffs|)
-        abs_d = np.abs(diffs)
-        am = np.mean(abs_d)
-        av = np.sum((abs_d - am) ** 2)
-        vol_acf = float(np.sum((abs_d[1:] - am) * (abs_d[:-1] - am)) / av) if av > 0 else 0
+        # Vol clustering: ACF of |returns - mean| at lag 1
+        abs_v = np.abs(values - m)
+        am = np.mean(abs_v)
+        av = np.var(abs_v)
+        if av > 0 and len(abs_v) > 1:
+            nn = len(abs_v)
+            vol_acf = float(
+                np.sum((abs_v[:-1] - am) * (abs_v[1:] - am)) / (nn * av)
+            )
+        else:
+            vol_acf = 0.0
 
-        # Extreme events
-        normalized = np.abs(diffs - m) / s if s > 0 else np.zeros_like(diffs)
-        gt3 = float(np.mean(normalized > 3))
-        gt4 = float(np.mean(normalized > 4))
+        # Extreme events relative to the return distribution
+        if s > 0:
+            z_abs = np.abs(values - m) / s
+            gt3 = float(np.mean(z_abs > 3))
+            gt4 = float(np.mean(z_abs > 4))
+        else:
+            gt3 = 0.0
+            gt4 = 0.0
 
-        # PE
-        from itertools import permutations
+        # Permutation entropy (order 4), on the raw return series
         from collections import Counter
         from math import factorial, log2
 
@@ -386,10 +418,10 @@ class ContingencyRNG:
 
         return {
             'n': n,
-            'mean': float(np.mean(values)),
-            'std': float(np.std(values)),
+            'mean': float(m),
+            'std': float(s),
             'kurtosis': float(K),
-            'skewness': float(np.mean(((diffs - m) / s) ** 3)) if s > 0 else 0,
+            'skewness': float(skew),
             'vol_clustering_acf': vol_acf,
             'gt_3sigma': gt3,
             'gt_4sigma': gt4,
@@ -406,8 +438,149 @@ class ContingencyRNG:
 # ============ PRESETS ============
 
 def gaussian(seed=42):
-    """PRNG-like: K≈3, no fat tails, no clustering."""
+    """Internal reference: CRNG asked to imitate Gaussian (K≈3).
+
+    ⚠️  NOT the baseline for CRNG vs PRNG comparisons.
+
+    This function still runs through the full oscillator/resonance/cascade
+    machinery with low targets. Empirical measurement with n=100k and
+    seed=42 shows residual vol_clustering_acf ≈ 0.20 at lag 1 — not iid.
+
+    For an honest iid-Gaussian baseline (true numpy PRNG, no oscillator),
+    use `iid_gaussian(seed)`. That is the function the README, benchmarks,
+    and all public comparisons must reference.
+
+    `gaussian()` is preserved only as an internal reference: "what does the
+    CRNG architecture produce when asked to behave like iid Gaussian?".
+    Useful for studying the oscillator's residual clustering, not for
+    claiming equivalence to iid noise.
+
+    See SPECS.md principle P6 and REVIEWS/codex_review_2026-04.md item P2.2.
+    """
     return ContingencyRNG(seed=seed, target_kurtosis=3.0, vol_clustering=0.0)
+
+
+class IIDGaussian:
+    """True iid Gaussian baseline — thin wrapper over numpy.default_rng.
+
+    No oscillator. No resonance. No cascade. Just ``standard_normal``.
+
+    This is THE baseline for any CRNG vs PRNG comparison in the project.
+    It exposes the same minimal interface as ``ContingencyRNG`` so that
+    benchmark scripts can treat it as a drop-in alternative.
+
+    Example:
+        >>> from crng import iid_gaussian, gold
+        >>> baseline = iid_gaussian(seed=42)
+        >>> crng     = gold(seed=42)
+        >>> b_samples = baseline.generate(100_000)
+        >>> c_samples = crng.generate(100_000)
+        >>> # compare fingerprints...
+
+    See SPECS.md principle P6.
+    """
+
+    def __init__(self, seed=42):
+        self.seed = int(seed)
+        self._rng = np.random.default_rng(self.seed)
+        self.target_kurtosis = 3.0
+        self.vol_clustering = 0.0
+        self.amplification = 0.0
+
+    def next(self):
+        """Single draw from standard normal."""
+        return float(self._rng.standard_normal())
+
+    def generate(self, n):
+        """Array of n draws from standard normal."""
+        return self._rng.standard_normal(int(n))
+
+    def flip(self):
+        """Coin flip via sign of a standard normal draw."""
+        return int(self._rng.standard_normal() > 0)
+
+    def generate_flips(self, n):
+        """n coin flips via sign of standard normal draws."""
+        return (self._rng.standard_normal(int(n)) > 0).astype(int)
+
+    def uniform(self, low=0.0, high=1.0):
+        """Uniform in [low, high) via numpy default_rng."""
+        return float(self._rng.uniform(low, high))
+
+    def reset(self, seed=None):
+        """Reset internal RNG to a new seed (or the same seed if None)."""
+        if seed is not None:
+            self.seed = int(seed)
+        self._rng = np.random.default_rng(self.seed)
+
+    def stats(self, n=10000):
+        """Statistical summary on the generated values.
+
+        For the iid Gaussian baseline the expected values are:
+          kurtosis ≈ 3.0
+          vol_clustering_acf ≈ 0.0
+          gt_3sigma ≈ 0.27%
+          gt_4sigma ≈ 0.006%
+          PE_4 ≈ 1.0 (maximum entropy)
+        """
+        values = self.generate(int(n))
+        m = float(np.mean(values))
+        s = float(np.std(values, ddof=1))
+        if s == 0:
+            return {
+                'n': int(n), 'mean': m, 'std': 0.0, 'kurtosis': 3.0,
+                'skewness': 0.0, 'vol_clustering_acf': 0.0,
+                'gt_3sigma': 0.0, 'gt_4sigma': 0.0, 'PE_4': 0.0,
+                'target_kurtosis': 3.0, 'amplification': 0.0,
+            }
+        K = float(np.mean(((values - m) / s) ** 4))
+        skew = float(np.mean(((values - m) / s) ** 3))
+        # vol clustering: ACF of |values| at lag 1
+        abs_v = np.abs(values - m)
+        abs_m = float(np.mean(abs_v))
+        abs_var = float(np.var(abs_v))
+        if abs_var > 0 and len(abs_v) > 1:
+            vol_acf = float(
+                np.sum((abs_v[:-1] - abs_m) * (abs_v[1:] - abs_m))
+                / (len(abs_v) * abs_var)
+            )
+        else:
+            vol_acf = 0.0
+        z = np.abs(values - m) / s
+        gt3 = float(np.mean(z > 3.0))
+        gt4 = float(np.mean(z > 4.0))
+        # permutation entropy
+        from math import log2, factorial
+        from collections import Counter as _Counter
+        order = 4
+        if len(values) < order + 1:
+            pe4 = 0.0
+        else:
+            patterns = _Counter()
+            for i in range(len(values) - order + 1):
+                patterns[tuple(np.argsort(values[i:i + order]))] += 1
+            total = sum(patterns.values())
+            probs = [c / total for c in patterns.values()]
+            entropy = -sum(p * log2(p) for p in probs if p > 0)
+            pe4 = entropy / log2(factorial(order)) if factorial(order) > 1 else 0.0
+        return {
+            'n': int(n), 'mean': m, 'std': s, 'kurtosis': K, 'skewness': skew,
+            'vol_clustering_acf': vol_acf, 'gt_3sigma': gt3, 'gt_4sigma': gt4,
+            'PE_4': pe4, 'target_kurtosis': 3.0, 'amplification': 0.0,
+        }
+
+    def __repr__(self):
+        return f"IIDGaussian(seed={self.seed})  # numpy default_rng baseline"
+
+
+def iid_gaussian(seed=42):
+    """Return a true iid Gaussian baseline (numpy default_rng, no oscillator).
+
+    This is THE baseline for any CRNG vs PRNG comparison per SPECS.md P6.
+    Expected fingerprint (n=100k):
+        K ≈ 3.0, vol_acf_lag1 ≈ 0.0, tail_3σ ≈ 0.27%, PE_4 ≈ 1.0
+    """
+    return IIDGaussian(seed=seed)
 
 def gold(seed=42):
     """Gold-market-like: K≈9, moderate clustering."""
@@ -432,6 +605,20 @@ def from_data(data, seed=42, calibration_rounds=5):
     Measures kurtosis and vol clustering from the data and iteratively
     tunes the CRNG to match the data's statistical signature.
 
+    .. warning::
+        **Known degeneracy:** for assets whose training-window kurtosis is
+        modest (roughly K < 5.5) and whose volatility clustering is weak,
+        the iterative calibration can collapse to a near-Gaussian state
+        (``target_kurtosis=3``, ``amplification=0``). In that case the
+        returned instance is effectively equivalent to ``iid_gaussian()``.
+        This function emits a ``RuntimeWarning`` when it detects the
+        collapse — always check the returned ``rng.target_kurtosis`` and
+        ``rng.amplification`` against your source data before treating the
+        output as "calibrated". See
+        ``REVIEWS/cross_asset_models_2026-04-10.md`` section "NEW FINDING:
+        from_data has a silent degeneracy mode" for the documented cases
+        (Gold, SP500) on the frozen 2026-04 snapshot.
+
     Args:
         data: array-like of prices (will compute log returns)
               or returns (if mean ≈ 0 and std << 1)
@@ -441,6 +628,7 @@ def from_data(data, seed=42, calibration_rounds=5):
     Returns:
         ContingencyRNG calibrated to the data's statistical signature
     """
+    import warnings
     data = np.array(data, dtype=float)
     data = data[np.isfinite(data) & (data != 0)]
 
@@ -495,4 +683,22 @@ def from_data(data, seed=42, calibration_rounds=5):
         else:
             break
 
-    return ContingencyRNG(seed=seed, target_kurtosis=K_input, vol_clustering=vol_cl)
+    result = ContingencyRNG(seed=seed, target_kurtosis=K_input, vol_clustering=vol_cl)
+
+    # Detect the silent degeneracy mode: if the real data has non-trivial
+    # excess kurtosis but calibration converged to near-Gaussian, emit a
+    # RuntimeWarning so the caller is not misled.
+    if K_target > 3.5 and result.target_kurtosis <= 3.001 and result.amplification <= 1e-9:
+        warnings.warn(
+            f"crng.from_data: calibration degenerated to a near-Gaussian state "
+            f"(target_kurtosis=3, amplification=0) even though the source "
+            f"data has kurtosis={K_target:.3f}. The returned instance is "
+            f"effectively equivalent to iid_gaussian() for shape purposes. "
+            f"This is a known failure mode for assets with modest kurtosis "
+            f"(K<~5.5) and weak vol clustering — see REVIEWS/"
+            f"cross_asset_models_2026-04-10.md.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+
+    return result

@@ -1,0 +1,52 @@
+{
+  "model4_pure_tson": {
+    "mean": 2.42073,
+    "median": 2.0,
+    "mode": 2,
+    "distribution": {
+      "2": 631848,
+      "3": 318091,
+      "4": 47582,
+      "5": 2441,
+      "6": 38
+    }
+  },
+  "model3_potency": {
+    "mean": 2.630291,
+    "median": 2.0,
+    "distribution": {
+      "2": 500405,
+      "3": 381663,
+      "4": 105710,
+      "5": 11686,
+      "6": 530,
+      "7": 6
+    }
+  },
+  "model2_crng": {
+    "mean": 467.935,
+    "median": 500.0,
+    "p_lt_50": 0.0128,
+    "p_lt_100": 0.0272
+  },
+  "model1_constant": {
+    "mean": 7.0332,
+    "median": 7.0,
+    "censored": 0.0
+  },
+  "model1_logarithmic": {
+    "mean": 21.0332,
+    "median": 16.0,
+    "censored": 0.0
+  },
+  "model1_sqrt": {
+    "mean": 22.2786,
+    "median": 16.0,
+    "censored": 0.0
+  },
+  "model1_linear": {
+    "mean": 24.7584,
+    "median": 18.0,
+    "censored": 0.0
+  }
+}

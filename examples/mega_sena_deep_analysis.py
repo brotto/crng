@@ -427,8 +427,10 @@ def main():
     # Domain analysis
     print(f"\n  3. DOMAIN MISMATCH: CRNG was designed for financial fat tails,")
     print(f"     not discrete uniform lottery selections. The proper comparison")
-    print(f"     domain for CRNG is financial time series (where it wins 86%).")
-    print(f"     Lottery is a fundamentally different stochastic process.")
+    print(f"     domain for CRNG is financial time series (frozen snapshot")
+    print(f"     2026-04-10: CRNG closer to real on 16 of 21 cells vs iid — see")
+    print(f"     posts/benchmark_errata_2026-04-10.md). Lottery is a")
+    print(f"     fundamentally different stochastic process.")
 
     print(f"\n  4. INTERESTING ANOMALIES:")
     # Find sequences where kurtosis is notably different from 3

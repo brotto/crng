@@ -1,0 +1,43 @@
+{
+  "snapshot_name": "snapshot_2026-04",
+  "frozen_at": "2026-04-10T23:17:15.479374+00:00",
+  "source": "yfinance (Yahoo Finance)",
+  "period": "5y",
+  "interval": "1d",
+  "column_is": "log-return series will be computed by consumers; this CSV holds CLOSE prices",
+  "symbols": {
+    "Gold": "GC=F",
+    "EURUSD": "EURUSD=X",
+    "ETH": "ETH-USD",
+    "BTC": "BTC-USD",
+    "SP500": "^GSPC",
+    "Oil": "CL=F",
+    "USDJPY": "JPY=X"
+  },
+  "n_rows": 3848,
+  "date_range": {
+    "start": "2021-04-10",
+    "end": "2026-04-10"
+  },
+  "columns": [
+    "Gold",
+    "EURUSD",
+    "ETH",
+    "BTC",
+    "SP500",
+    "Oil",
+    "USDJPY"
+  ],
+  "non_nan_counts": {
+    "Gold": 1258,
+    "EURUSD": 1300,
+    "ETH": 1827,
+    "BTC": 1827,
+    "SP500": 1256,
+    "Oil": 1258,
+    "USDJPY": 1300
+  },
+  "sha256": "82f8b5e5abe2f9d084769898b8d3b6ffefc5cfbd1c2757531df76d049ec9fff5",
+  "immutable": true,
+  "notes": "Per SPECS.md P2, this file is IMMUTABLE once written. Do not edit. To produce a new snapshot, create snapshot_2026-05/ etc. Log-returns are computed at read time by consumers (benchmarks/frozen_benchmark.py) so the raw CSV stays canonical."
+}

@@ -1,6 +1,18 @@
+> ⚠️ **RETRACTION 2026-04-11 — this post is withdrawn from the v0.2.1
+> release.** The `v0.3.0` version reference is incorrect (the actual
+> release cycle stopped at v0.2.1 with the retraction of the 86% headline).
+> The "Distribution Scorecard: CRNG 5/6 (83%)" and "Forecast MAE: CRNG
+> wins 4/5 horizons" figures carry no pointer to a frozen artifact and
+> were produced inside the broken-`stats()` era; they do not survive
+> SPECS.md principles P2 (frozen evidence) and P7 (no hedging /
+> target-vs-achieved). The text below is preserved for audit — do not
+> cite it. A rewritten weather validation post using the frozen
+> `benchmarks/snapshot_2026-04/` discipline and the CRNG-Cast
+> `weather_monitor/` scorecard will ship in a later release.
+
 # Weather Prediction Experiment — Fat Tails in Climate Data
 
-## CRNG v0.3.0 — Weather Forecast Validation
+## CRNG v0.3.0 — Weather Forecast Validation (RETRACTED, see banner)
 
 ### What's New
 

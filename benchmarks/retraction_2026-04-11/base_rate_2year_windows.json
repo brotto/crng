@@ -1,0 +1,398 @@
+{
+  "method": "non_overlapping_2year_windows",
+  "source_events": {
+    "earthquakes": 39,
+    "crashes": 19,
+    "disasters": 24,
+    "raw_total": 82,
+    "unique_dates": 79
+  },
+  "window_length_days": "~730",
+  "window_start_first": "1900-01-01",
+  "window_start_last": "2024-01-01",
+  "n_windows": 63,
+  "n_windows_with_event": 48,
+  "n_windows_empty": 15,
+  "base_rate_fraction": "48/63",
+  "base_rate_decimal": 0.761905,
+  "windows": [
+    {
+      "start": "1900-01-01",
+      "end": "1902-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1902-01-01",
+      "end": "1904-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1904-01-01",
+      "end": "1906-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1906-01-01",
+      "end": "1908-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1908-01-01",
+      "end": "1910-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1910-01-01",
+      "end": "1912-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1912-01-01",
+      "end": "1914-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1914-01-01",
+      "end": "1916-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1916-01-01",
+      "end": "1918-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1918-01-01",
+      "end": "1920-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1920-01-01",
+      "end": "1922-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1922-01-01",
+      "end": "1924-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1924-01-01",
+      "end": "1926-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1926-01-01",
+      "end": "1928-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1928-01-01",
+      "end": "1930-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1930-01-01",
+      "end": "1932-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "1932-01-01",
+      "end": "1934-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1934-01-01",
+      "end": "1936-01-01",
+      "n_events": 3,
+      "has_event": true
+    },
+    {
+      "start": "1936-01-01",
+      "end": "1938-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1938-01-01",
+      "end": "1940-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "1940-01-01",
+      "end": "1942-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1942-01-01",
+      "end": "1944-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1944-01-01",
+      "end": "1946-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1946-01-01",
+      "end": "1948-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1948-01-01",
+      "end": "1950-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1950-01-01",
+      "end": "1952-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1952-01-01",
+      "end": "1954-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "1954-01-01",
+      "end": "1956-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1956-01-01",
+      "end": "1958-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1958-01-01",
+      "end": "1960-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1960-01-01",
+      "end": "1962-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1962-01-01",
+      "end": "1964-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1964-01-01",
+      "end": "1966-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "1966-01-01",
+      "end": "1968-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1968-01-01",
+      "end": "1970-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1970-01-01",
+      "end": "1972-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "1972-01-01",
+      "end": "1974-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1974-01-01",
+      "end": "1976-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1976-01-01",
+      "end": "1978-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1978-01-01",
+      "end": "1980-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1980-01-01",
+      "end": "1982-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1982-01-01",
+      "end": "1984-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1984-01-01",
+      "end": "1986-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "1986-01-01",
+      "end": "1988-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "1988-01-01",
+      "end": "1990-01-01",
+      "n_events": 3,
+      "has_event": true
+    },
+    {
+      "start": "1990-01-01",
+      "end": "1992-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1992-01-01",
+      "end": "1994-01-01",
+      "n_events": 0,
+      "has_event": false
+    },
+    {
+      "start": "1994-01-01",
+      "end": "1996-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "1996-01-01",
+      "end": "1998-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "1998-01-01",
+      "end": "2000-01-01",
+      "n_events": 4,
+      "has_event": true
+    },
+    {
+      "start": "2000-01-01",
+      "end": "2002-01-01",
+      "n_events": 3,
+      "has_event": true
+    },
+    {
+      "start": "2002-01-01",
+      "end": "2004-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "2004-01-01",
+      "end": "2006-01-01",
+      "n_events": 3,
+      "has_event": true
+    },
+    {
+      "start": "2006-01-01",
+      "end": "2008-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "2008-01-01",
+      "end": "2010-01-01",
+      "n_events": 3,
+      "has_event": true
+    },
+    {
+      "start": "2010-01-01",
+      "end": "2012-01-01",
+      "n_events": 5,
+      "has_event": true
+    },
+    {
+      "start": "2012-01-01",
+      "end": "2014-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "2014-01-01",
+      "end": "2016-01-01",
+      "n_events": 2,
+      "has_event": true
+    },
+    {
+      "start": "2016-01-01",
+      "end": "2018-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "2018-01-01",
+      "end": "2020-01-01",
+      "n_events": 3,
+      "has_event": true
+    },
+    {
+      "start": "2020-01-01",
+      "end": "2022-01-01",
+      "n_events": 1,
+      "has_event": true
+    },
+    {
+      "start": "2022-01-01",
+      "end": "2024-01-01",
+      "n_events": 3,
+      "has_event": true
+    },
+    {
+      "start": "2024-01-01",
+      "end": "2026-01-01",
+      "n_events": 1,
+      "has_event": true
+    }
+  ]
+}

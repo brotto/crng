@@ -1,23 +1,49 @@
 """
-NEXT CATASTROPHE PREDICTOR (EXPERIMENTAL / PRIVATE)
+NEXT CATASTROPHE PREDICTOR — DEPRECATED (2026-04-10)
 =====================================================
 
-Based on the catastrophic events experiment findings:
-- 82 events from 1900-2025
-- Gap distributions match CRNG with 20/20 KS tests
-- Quasi-periodic structure detected (5.46x power ratio)
+⚠️  **DEPRECATED — DO NOT USE. See REVIEWS/errata/2026-04-10_next_catastrophe_quantile_bug.md** ⚠️
 
-Method:
-1. Analyze historical gap distribution (empirical)
-2. Fit the dominant period from FFT
-3. Monte Carlo forward simulation using CRNG gap sampling
-4. Build probability density for "days until next event"
-5. Report most probable window
+This experiment contains a methodological bug in the "Method 2: CRNG-Modulated
+Sampling" section (formerly at lines 182-189). The bug:
 
-NOT for publication. Experimental only.
+    crng_val = rng.next()
+    quantile = min(max(crng_val, 0.001), 0.999)
+    gap = np.percentile(gaps, quantile * 100)
 
-Ale Brotto — 2026-03-31
+`ContingencyRNG.next()` does NOT return a uniform variate in [0,1]. It returns
+a value centered around zero with fat tails and variable std. Treating it as a
+quantile and clipping to [0.001, 0.999] collapses more than 50% of the samples
+onto the 0.001 floor and a smaller fraction onto the 0.999 ceiling. The
+resulting "CRNG-modulated prediction window" is dominated by clipping artifacts,
+not by a valid probabilistic transform.
+
+The CORRECT transformation from CRNG output to quantiles is via the empirical
+CDF of a large pre-generated sample:
+
+    samples = rng.generate(100_000)
+    ranks = np.argsort(np.argsort(samples))
+    quantiles = (ranks + 0.5) / len(samples)
+
+This file is preserved for audit/history. It must NOT be cited as evidence for
+any CRNG claim about catastrophic event timing.
+
+Original author: Ale Brotto — 2026-03-31
+Deprecated: 2026-04-10 following Codex review P1.2
+See: crng-package/REVIEWS/codex_review_2026-04.md
 """
+
+raise RuntimeError(
+    "experiments/_DEPRECATED_next_catastrophe.py contains a quantile-mapping bug "
+    "documented in REVIEWS/errata/2026-04-10_next_catastrophe_quantile_bug.md. "
+    "Do not run this script for any production or publication use. "
+    "Preserved as raw source for audit only."
+)
+
+
+# =============================================================================
+# ORIGINAL CODE BELOW — PRESERVED FOR AUDIT ONLY, UNREACHABLE AFTER RAISE
+# =============================================================================
 
 import numpy as np
 from scipy import stats as sp_stats

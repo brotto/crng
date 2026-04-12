@@ -14,3 +14,19 @@ env/
 fragility_monitor/data/
 weather_monitor/data/
 data/
+
+# macOS cruft
+.DS_Store
+
+# Private working notes (local only — not part of the PyPI package)
+obsidian_notes/
+Projetos Futuros.md
+.git-v0.2.1-manifest.md
+
+# Pre-retraction celebratory letter: references v0.3.0 and carries
+# unsourced Lorenz / CRNG-Cast / Mega-Sena numerics. Deferred to a
+# post-v0.2.1 rewrite under SPECS.md discipline.
+posts/letter_to_anthropic.md
+
+# Large binary assets — host outside the repo
+charts/RPNG vs CRNG.mp4

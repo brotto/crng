@@ -1,0 +1,26 @@
+{
+  "parameters": {
+    "seed": 42,
+    "n_oscillators": 7,
+    "target_kurtosis": 8.0,
+    "vol_clustering": 0.35,
+    "n_samples": 100000
+  },
+  "sample_statistics": {
+    "mean": 0.00019034828935609064,
+    "std": 0.3491852304961381,
+    "min": -3.768080438476844,
+    "max": 5.224873072157381,
+    "median": -0.0016405976537828804
+  },
+  "clipping_counts": {
+    "below_0_001": 50355,
+    "above_0_999": 496,
+    "in_range_0_001_to_0_999": 49149
+  },
+  "clipping_fractions": {
+    "below_0_001": 0.50355,
+    "above_0_999": 0.00496,
+    "in_range_0_001_to_0_999": 0.49149
+  }
+}
